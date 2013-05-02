@@ -93,7 +93,6 @@
             center: that.center,
             zoom: that.zoom,
             draggable: that.draggable,
-            mapTypeId : google.maps.MapTypeId.ROADMAP
           }));
           
           google.maps.event.addListener(_instance, "dragstart",
@@ -331,13 +330,14 @@
       template: "<div class='angular-google-map' ng-transclude></div>",
       replace: false,
       scope: {
-        center: "=center", // required
-        markers: "=markers", // optional
-        latitude: "=latitude", // required
-        longitude: "=longitude", // required
-        zoom: "=zoom", // required
-        refresh: "&refresh", // optional
-        windows: "=windows" // optional"
+        center: "=", // required
+        latitude: "=", // required
+        longitude: "=", // required
+        zoom: "=", // required
+        mapTypeId: "=", // optional
+        markers: "=", // optional
+        refresh: "&", // optional
+        windows: "=" // optional"
       },
       controller: controller,      
       link: function (scope, element, attrs, ctrl) {
@@ -348,7 +348,7 @@
             (!angular.isDefined(scope.center.lat) || 
                 !angular.isDefined(scope.center.lng))) {
         	
-          $log.error("angular-google-maps: ould not find a valid center property");          
+          $log.error("angular-google-maps: could not find a valid center property");          
           return;
         }
         
@@ -365,13 +365,19 @@
           opts.options = angular.fromJson(attrs.options);
         }
         
+        if (scope.mapTypeId) {
+            opts.options.mapTypeId = scope.mapTypeId;
+        } else {
+            opts.options.mapTypeId = google.maps.MapTypeId.ROADMAP;
+        }
+
         // Create our model
         var _m = new MapModel(angular.extend(opts, {
-          container: element[0],            
-          center: new google.maps.LatLng(scope.center.lat, scope.center.lng),              
+          container: element[0],
+          center: new google.maps.LatLng(scope.center.lat, scope.center.lng),
           draggable: attrs.draggable == "true",
           zoom: scope.zoom
-        }));       
+        }));
       
         _m.on("drag", function () {
           
